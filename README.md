@@ -35,8 +35,12 @@ Open <http://127.0.0.1:5000>. The database is created automatically and seeded w
 ## Run tests
 
 ```bash
-pytest -q
+python -m pytest -q
 ```
+
+Alternatively, if your shell `PATH` includes the virtual-environment `bin`
+directory, plain `pytest -q` also works because `pytest.ini` configures
+`pythonpath = .`.
 
 ## Optional live WooCommerce sync
 
@@ -50,6 +54,17 @@ python app.py
 ```
 
 Generate credentials inside your WooCommerce admin under **WooCommerce → Settings → Advanced → REST API** and grant only the required permissions. Do not commit credentials or paste them into frontend JavaScript. Use a test/staging store first. If credentials are not configured, the interface records a clearly labeled demo sync; no remote store is modified.
+
+## Catalog CSV export
+
+Click **↓ Export CSV** in the dashboard heading to download the complete product catalog.
+
+- **Route**: `GET /products/export.csv`
+- **Exported fields**: id, name, sku, brand, category, price, stock, description, sync_status, sync_message, synced_at, created_at
+- **Filename format**: `smart_pim_catalog_YYYYMMDD_HHMMSS.csv` (UTC timestamp)
+- **Encoding**: UTF-8 with BOM for Excel compatibility
+- **Empty catalog**: returns a valid CSV containing column headers and zero data rows
+- **Formula-injection protection**: text cells starting with `=`, `+`, `-`, `@`, tab or carriage-return are escaped with a leading single-quote; numeric fields remain usable
 
 ## API/health check
 
@@ -72,6 +87,7 @@ smart-pim-integration/
 ├── static/style.css
 ├── tests/test_app.py
 ├── docs/architecture.md
+├── pytest.ini
 ├── .env.example
 ├── .gitignore
 ├── requirements.txt

@@ -1,6 +1,8 @@
 """Smart PIM: lightweight product information management demo."""
 from __future__ import annotations
 
+import logging
+
 import csv
 import io
 import os
@@ -123,26 +125,47 @@ def remove_product(product_id):
 @app.get("/products/export.csv")
 def export_products():
     """Download the complete catalog as a spreadsheet-friendly CSV."""
-    products = list_products(app.config["DATABASE"])
+    try:
+        products = list_products(app.config["DATABASE"])
+    except Exception:
+        logging.exception("CSV export: failed to query the product catalog.")
+        return "Export failed. Please try again.", 500
+
     fields = ("id", "name", "sku", "brand", "category", "price", "stock",
               "description", "sync_status", "sync_message", "synced_at", "created_at")
-    text_fields = {"name", "sku", "brand", "category", "description", "sync_status", "sync_message", "synced_at", "created_at"}
+    text_fields = {"name", "sku", "brand", "category", "description",
+                   "sync_status", "sync_message", "synced_at", "created_at"}
 
     def safe_cell(value, field):
+        """Sanitize a cell value for spreadsheet safety.
+
+        Text fields whose content (ignoring leading whitespace) starts with
+        characters that common spreadsheet applications may interpret as
+        formula prefixes (``=``, ``+``, ``-``, ``@``, tab, or carriage
+        return) are escaped with a leading single-quote.
+
+        Numeric fields (``id``, ``price``, ``stock``) pass through unchanged
+        so that legitimate negative numbers and zero remain usable.
+
+        Limitation: exotic formula-injection vectors (e.g. using non-ASCII
+        whitespace or embedding dangerous characters mid-value) are not
+        handled; this is a reasonable trade-off for an MVP.
+        """
         value = "" if value is None else str(value)
-        # Reduce spreadsheet formula-injection risk for user-controlled text cells.
-        if field in text_fields and value.lstrip().startswith(("=", "+", "-", "@")):
+        if field in text_fields and value.lstrip().startswith(("=", "+", "-", "@", "\t", "\r")):
             return "'" + value
         return value
 
     output = io.StringIO(newline="")
-    writer = csv.writer(output)
-    writer.writerow(fields)
+    writer = csv.DictWriter(output, fieldnames=fields, extrasaction="ignore")
+    writer.writeheader()
     for product in products:
-        writer.writerow([safe_cell(product.get(field), field) for field in fields])
+        writer.writerow({f: safe_cell(product.get(f), f) for f in fields})
 
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    filename = f"smart_pim_catalog_{stamp}.csv"
     response = app.response_class("\ufeff" + output.getvalue(), content_type="text/csv; charset=utf-8")
-    response.headers["Content-Disposition"] = 'attachment; filename="smart-pim-catalog.csv"'
+    response.headers["Content-Disposition"] = f'attachment; filename="{filename}"'
     return response
 
 
