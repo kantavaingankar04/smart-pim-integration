@@ -11,6 +11,7 @@ Build a centralized product catalog dashboard with CRUD operations, product attr
 - Validate required attributes, unique SKUs, price, and stock.
 - Review catalog findings and recommendations before making changes.
 - Support clearly labeled demo synchronization and optional live WooCommerce synchronization.
+- Export the catalog to a spreadsheet-friendly CSV file.
 - Record activity and provide tests and setup documentation.
 
 ## Architecture
@@ -38,6 +39,7 @@ Build a centralized product catalog dashboard with CRUD operations, product attr
 
 ## Demo acceptance criteria
 - Dashboard starts locally and shows seeded sample products.
+- User can download the catalog as a CSV file.
 - User can create, edit, search, and delete products.
 - Duplicate SKUs and invalid stock values are rejected.
 - Catalog Quality Agent reports the tools used, findings, and recommendations without silently changing data.

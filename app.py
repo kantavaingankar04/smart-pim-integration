@@ -1,6 +1,8 @@
 """Smart PIM: lightweight product information management demo."""
 from __future__ import annotations
 
+import csv
+import io
 import os
 from datetime import datetime, timezone
 from pathlib import Path
@@ -116,6 +118,32 @@ def remove_product(product_id):
         add_activity(app.config["DATABASE"], "Product deleted", f"{product['name']} ({product['sku']})", "warning")
         flash("Product deleted.", "success")
     return redirect(url_for("dashboard"))
+
+
+@app.get("/products/export.csv")
+def export_products():
+    """Download the complete catalog as a spreadsheet-friendly CSV."""
+    products = list_products(app.config["DATABASE"])
+    fields = ("id", "name", "sku", "brand", "category", "price", "stock",
+              "description", "sync_status", "sync_message", "synced_at", "created_at")
+    text_fields = {"name", "sku", "brand", "category", "description", "sync_status", "sync_message", "synced_at", "created_at"}
+
+    def safe_cell(value, field):
+        value = "" if value is None else str(value)
+        # Reduce spreadsheet formula-injection risk for user-controlled text cells.
+        if field in text_fields and value.lstrip().startswith(("=", "+", "-", "@")):
+            return "'" + value
+        return value
+
+    output = io.StringIO(newline="")
+    writer = csv.writer(output)
+    writer.writerow(fields)
+    for product in products:
+        writer.writerow([safe_cell(product.get(field), field) for field in fields])
+
+    response = app.response_class("\ufeff" + output.getvalue(), content_type="text/csv; charset=utf-8")
+    response.headers["Content-Disposition"] = 'attachment; filename="smart-pim-catalog.csv"'
+    return response
 
 
 @app.get("/quality")

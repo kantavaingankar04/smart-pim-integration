@@ -9,6 +9,7 @@ A hackathon MVP to manage a product catalog, validate product attributes, review
 - Tool-assisted **Catalog Quality Agent** with a visible plan, validation tools, severity-ranked findings, and recommendations.
 - WooCommerce REST API v3 create/update-by-SKU path when credentials are configured.
 - Explicit demo-sync behavior when live credentials are absent.
+- Downloadable catalog export as spreadsheet-friendly CSV.
 - SQLite persistence and automated tests.
 
 > Agent transparency: this MVP uses deterministic tool-based checks, not an LLM. It works offline and does not automatically change product data.
@@ -84,10 +85,11 @@ This MVP is designed for a short hackathon demo. It does not include authenticat
 ## Hackathon demo flow
 
 1. Open Overview and point out the sample catalog, inventory metrics, search, and activity list.
-2. Create a product and show the required-field / duplicate-SKU validation.
-3. Open Catalog Quality Agent and explain its three tools and human-review recommendations.
-4. Click Sync on a product. In demo mode, call out the explicit `Demo synced` state; with valid credentials, demonstrate the actual remote create/update.
-5. Run `pytest -q` and show the results.
+2. Export the catalog CSV to demonstrate data portability.
+3. Create a product and show the required-field / duplicate-SKU validation.
+4. Open Catalog Quality Agent and explain its three tools and human-review recommendations.
+5. Click Sync on a product. In demo mode, call out the explicit `Demo synced` state; with valid credentials, demonstrate the actual remote create/update.
+6. Run `pytest -q` and show the results.
 
 ## Submission assets
 

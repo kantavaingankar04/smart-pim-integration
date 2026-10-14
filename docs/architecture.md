@@ -8,12 +8,12 @@ The optional WooCommerce path is `Flask sync route` → `services/woocommerce.py
 
 ## Main modules
 
-- `app.py`: page routes, form validation, sync orchestration, health endpoint, user feedback.
+- `app.py`: page routes, form validation, CSV export, sync orchestration, health endpoint, user feedback.
 - `services/database.py`: SQLite schema, seed catalog, CRUD and activity logging.
 - `services/catalog_agent.py`: required-field checks, numeric validation, duplicate-SKU detection, prioritized recommendations.
 - `services/woocommerce.py`: create-or-update by SKU when live credentials are configured; explicit demo fallback otherwise.
 - `templates/`: dashboard, product form, and catalog-agent report.
-- `tests/test_app.py`: smoke, CRUD validation, quality workflow and demo sync tests.
+- `tests/test_app.py`: smoke, CRUD validation, quality workflow, CSV export, and demo sync tests.
 
 ## Security and reliability notes
 

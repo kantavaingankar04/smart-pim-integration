@@ -72,6 +72,18 @@ def test_sync_falls_back_to_explicit_demo_mode(monkeypatch):
     assert result["mode"] == "demo"
 
 
+def test_export_catalog_csv_downloads_seed_products(client_and_db):
+    client, _ = client_and_db
+    response = client.get("/products/export.csv")
+    assert response.status_code == 200
+    assert response.content_type.startswith("text/csv")
+    assert 'attachment; filename="smart-pim-catalog.csv"' == response.headers["Content-Disposition"]
+    csv_text = response.data.decode("utf-8-sig")
+    assert "id,name,sku,brand,category,price,stock" in csv_text
+    assert "Everyday Cotton T-Shirt" in csv_text
+    assert "TSHIRT-001" in csv_text
+
+
 def test_health_endpoint(client_and_db):
     client, _ = client_and_db
     response = client.get("/health")
