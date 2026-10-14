@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Smart PIM{% endblock %} · Smart PIM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="{{ url_for('dashboard') }}"><span class="brand-mark"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 9.5 16 3l11 6.5v13L16 29 5 22.5z"/><path d="m5.5 9.8 10.5 6.4 10.5-6.4M16 16.2V28"/></svg></span><span>smart<span class="brand-light">pim</span><small>PRODUCT OPERATIONS</small></span></a>
+      <div class="workspace"><span class="workspace-dot"></span><span><strong>Demo workspace</strong><small>Local catalog</small></span><span class="chevrons">⌄</span></div>
+      <p class="nav-label">WORKSPACE</p>
+      <nav class="nav-list">
+        <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}"><span class="nav-icon">▦</span>Overview</a>
+        <a class="nav-link {% if request.endpoint in ['new_product','edit_product'] %}active{% endif %}" href="{{ url_for('new_product') }}"><span class="nav-icon">＋</span>Products <span class="nav-add">+</span></a>
+        <a class="nav-link {% if request.endpoint == 'quality_agent' %}active{% endif %}" href="{{ url_for('quality_agent') }}"><span class="nav-icon">✳</span>AI quality agent <span class="new-pill">TOOL</span></a>
+      </nav>
+      <p class="nav-label integration-label">INTEGRATIONS</p>
+      <div class="integration-card"><span class="woo-mark">W</span><span><strong>WooCommerce</strong><small>{% if config.get('WC_LIVE_MODE') %}Live sync configured{% else %}Demo mode enabled{% endif %}</small></span><span class="status-dot"></span></div>
+      <div class="sidebar-bottom"><div class="help-box"><span class="help-icon">↗</span><strong>Ready for your store?</strong><p>Configure API credentials in your local environment to enable live sync.</p></div><div class="profile"><div class="avatar">SP</div><span><strong>Smart PIM Admin</strong><small>Project workspace</small></span><span class="profile-menu">···</span></div></div>
+    </aside>
+    <main class="main-area">
+      <header class="topbar"><div class="breadcrumbs"><span>Workspace</span><span class="crumb-sep">/</span><strong>{% block breadcrumb %}Overview{% endblock %}</strong></div><div class="top-actions"><span class="demo-indicator"><i></i>{% if config.get('WC_LIVE_MODE') %} LIVE SYNC CONFIGURED{% else %} DEMO ENVIRONMENT{% endif %}</span><button class="icon-button" title="Notifications" aria-label="Notifications">♧</button><div class="top-avatar">SP</div></div></header>
+      <div class="page-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}<div class="flash-stack">{% for category, message in messages %}<div class="flash {{ category }}">{{ message }} <button onclick="this.parentElement.remove()" aria-label="Dismiss">×</button></div>{% endfor %}</div>{% endif %}{% endwith %}
+        {% block content %}{% endblock %}
+        <footer class="footer"><span>© {{ current_year }} Smart PIM</span><span><span class="footer-dot"></span> All systems operational <span class="footer-separator">·</span> Built for the integration challenge</span></footer>
+      </div>
+    </main>
+  </div>
+</body></html>
